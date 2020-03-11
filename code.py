@@ -44,7 +44,7 @@ def main():
 
 		# plt.figure("Thres")
 		# plt.imshow(edges)
-		cv2.imshow("Thresh",edges)
+		# cv2.imshow("Thresh",edges)
 
 		hist_along_x_left = np.sum(edges[:,:int(edges.shape[1]/2)]>0, axis=0)
 		hist_along_x_right = np.sum(edges[:,int(edges.shape[1]/2):]>0, axis=0)
@@ -68,7 +68,7 @@ def main():
 
 		# plt.figure("New Edges")
 		# plt.imshow(edges)
-		cv2.imshow("New Edges",edges)
+		# cv2.imshow("New Edges",edges)
 
 		# cv2.waitKey(0)
 		# sys.exit(0)
@@ -86,33 +86,48 @@ def main():
 
 		pl = np.polyfit(left_lane_pts[0],left_lane_pts[1],2)
 		pr = np.polyfit(right_lane_pts[0],right_lane_pts[1],2)
-		# print("Polyfit Left: ",pl)
-		# print("Polyfit Right: ",pr)
-
-		center_line = [] 
-		for x in range(0,512):
-			# print("Value :",x,((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2])),((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2])))
-			warped[x,int((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2]))] = [255,0,0]
-			warped[x,int((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2]))] = [0,0,255]
+		
+		# Radius of curvature formula https://www.quora.com/How-can-I-find-the-curvature-of-parabola-y-ax-2-bx-c
 		curvature =(10**11) * ((2*pr[0])/((1+((2*pr[0]*(-pr[2]/(2*pr[0])))+pr[1])**2)*np.sqrt(1+((2*pr[0]*(-pr[2]/(2*pr[0])))+pr[1])**2)))
-		print("Curvature :",curvature )
-			# warped[x,int((((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2])) + ((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2])))/2)] = [0,255,0]
-		# center_line.append([x,int((((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2])) + ((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2])))/2)])
-		# center_line = np.array(center_line)
-		# cl = np.polyfit(center_line[:,0],center_line[:,1],1)
-		# print("Center Gradient",cl[0])
-
-		curve = "Center"
-
+		curve = "Straight"
 		if (curvature>(0.6)):
 			curve = "Right"
 		if (curvature<-0.6):
 			curve = "Left"		
 
+		# print("Polyfit Left: ",pl)
+		# print("Polyfit Right: ",pr)
+		# print("Curvature :",curvature )
+		# right_poly = []
+		# left_poly = []
+		lane = np.zeros((warped.shape[0],warped.shape[1],2))
+		for x in range(0,512):
+			# print("Value :",x,((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2])),((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2])))
+			# warped[x,int((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2]))] = [255,0,0]
+			# warped[x,int((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2]))] = [0,0,255]
+			lane[x,int((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2])),0] = 255
+			lane[x,int((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2])),1] = 255
+			# right_poly.append([x,int((pl[0]*(x**2)) + (pl[1]*(x**1)) + (pl[2]))])
+			# left_poly.append([x,int((pr[0]*(x**2)) + (pr[1]*(x**1)) + (pr[2]))])
+
+		# right_poly = np.array(right_poly)
+		# left_poly = np.array(left_poly)
+
 		print("Curve :",curve)
-		# # plt.figure("Warped")
-		cv2.imshow("Warped",warped)
+		# plt.figure("Warped")
+		# cv2.imshow("Warped",warped)
+		# cv2.imshow("Lane l",lane[:,:,0])
+		# cv2.imshow("Lane r",lane[:,:,1])
 				
+		world_lane_left = cv2.warpPerspective(lane[:,:,0],np.linalg.inv(H),(w,h))
+		world_lane_right = cv2.warpPerspective(lane[:,:,1],np.linalg.inv(H),(w,h))
+
+		dst[world_lane_left>0] = [255,0,0]
+		dst[world_lane_right>0] = [0,0,255]
+		print([world_lane_left>0,world_lane_right>0])
+		# world_lane = cv2.warpPerspective(warped,np.linalg.inv(H),(w,h))
+		# dst = cv2.fillPoly(dst,[world_lane_left>0,world_lane_right>0],[0,255,0])
+		cv2.imshow("Lane World",dst)
 
 		cv2.waitKey(0)
 
