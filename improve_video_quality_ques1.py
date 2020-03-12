@@ -28,21 +28,26 @@ def main():
 		print("Please give path to an mp4 or avi file.")
 		sys.exit(0)
 
+	# out = cv2.VideoWriter('Improved_Frames_Prob1.mp4',cv2.VideoWriter_fourcc(*'MP4V'), 20.0, (1920,1080))
+
 	cap= cv2.VideoCapture(video_path)
 	i = 0
 	while(cap.isOpened()):
 		ret, frame = cap.read()
-		frame = cv2.resize(frame, (frame.shape[1]/2, frame.shape[0]/2))
+		# frame = cv2.resize(frame, (frame.shape[1]/2, frame.shape[0]/2))
 		if ret == False:
 			break
 
 		improved_frame = improveQuality(frame)
 
+		# out.write(improved_frame)
+		
 		cv2.imshow('frame.png', frame)
 		cv2.imshow('improved_frame.png', improved_frame)
 		if cv2.waitKey(1) & 0xFF == ord('w'):
 			cv2.imwrite('frame%d.png'%(i), frame)
-			cv2.imwrite('improved_frame%d.png'%(i), improved_frame)
+			cv2.imwrite('./improved_frame%d.png'%(i), improved_frame)
+
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 

@@ -30,6 +30,12 @@ The directory list for the dataset is given below
         └── challenge_video.mp4
 
 ```
+## Instructions to run the code for problem 1
+- The python script `improve_video_quality_ques1.py` runs on every individual frame of the video.
+```
+python3 improve_video_quality_ques1.py ../Data/Night\ Drive\ -\ 2689_Problem1.mp4
+```
+
 ## Instructions to run the code
 
 - The python script `code.py` is the lane detection script for the dataset 1. To run the code, open a new terminal in the directory and type
