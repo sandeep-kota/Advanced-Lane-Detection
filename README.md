@@ -1,4 +1,4 @@
-# Lane Detection
+# Lane Detection for Autonomous Vehciles
 
 This is the python implementation of lane detection used in autonomous vehicles. The techniques used in this work are geometric vision based and are not robust for all scenarios.
 
